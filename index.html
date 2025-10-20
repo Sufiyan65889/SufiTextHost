@@ -1,103 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TextHost Pro 📝</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TextHost Pro 🚀</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Firebase JS SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDIIFcltH_WwkmVmjbpsROHelC3Bc5q5L8",
+    authDomain: "sufi-hosting.firebaseapp.com",
+    databaseURL: "https://sufi-hosting-default-rtdb.firebaseio.com",
+    projectId: "sufi-hosting",
+    storageBucket: "sufi-hosting.firebasestorage.app",
+    messagingSenderId: "556098236259",
+    appId: "1:556098236259:web:21007dc0e69d468aa66d56",
+    measurementId: "G-VSSGPEED06"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.db = getDatabase(app);
+</script>
 </head>
 <body class="bg-gray-50 font-['Roboto'] min-h-screen flex flex-col items-center p-6">
 
-  <h1 class="text-4xl font-bold mb-6 text-gray-900">TextHost Pro 🚀</h1>
+<h1 class="text-4xl font-bold mb-6 text-gray-900">TextHost Pro 🚀</h1>
 
-  <div class="w-full max-w-3xl bg-white shadow-lg rounded-lg p-6 flex flex-col gap-4">
+<div class="w-full max-w-3xl bg-white shadow-lg rounded-lg p-6 flex flex-col gap-4">
 
-    <!-- Slug -->
-    <div>
-      <label class="font-medium mb-1 block">Custom Link Name (slug)</label>
-      <input id="slug" placeholder="Example: My-New-User" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500" />
-    </div>
-
-    <!-- Text Area -->
-    <div>
-      <label class="font-medium mb-1 block">Your Text / Content</label>
-      <textarea id="userText" rows="10" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="Write here..."></textarea>
-    </div>
-
-    <!-- Options -->
-    <div class="flex flex-wrap gap-3 items-center">
-      <select id="fontStyle" class="border rounded px-2 py-1">
-        <option value="font-bold">Bold</option>
-        <option value="font-normal">Normal</option>
-        <option value="italic">Italic</option>
-        <option value="font-mono">Monospace</option>
-      </select>
-
-      <input id="bgColor" type="color" value="#ffffff" title="Background color" class="border rounded p-1" />
-
-      <input id="fontSize" type="number" value="16" min="10" max="100" title="Font size (px)" class="border rounded px-2 py-1 w-24" />
-
-      <button id="saveBtn" class="ml-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Save & Get Link</button>
-    </div>
-
-    <div id="msg" class="text-red-500 text-sm"></div>
-
-    <!-- Result -->
-    <div id="result" class="hidden p-3 border rounded bg-gray-100">
-      <div class="mb-1 font-medium">Your Hosted Link:</div>
-      <a id="publicLink" href="#" target="_blank" class="text-blue-600 underline"></a>
-      <div class="mt-2 text-xs text-gray-600">Copy this link and share 🌟</div>
-    </div>
-
+  <!-- Subdomain / Slug -->
+  <div>
+    <label class="font-medium mb-1 block">Custom Link Name (Optional)</label>
+    <input id="slug" placeholder="Leave blank for random unique ID" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500" />
   </div>
 
-<script>
-const saveBtn = document.getElementById('saveBtn');
-const msg = document.getElementById('msg');
-const result = document.getElementById('result');
-const publicLink = document.getElementById('publicLink');
+  <!-- Text Area -->
+  <div>
+    <label class="font-medium mb-1 block">Your Text / Content</label>
+    <textarea id="userText" rows="10" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="Write here..."></textarea>
+  </div>
 
-function sanitizeSlug(s){
-  return s.trim().replace(/[^a-zA-Z0-9\-_]/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
-}
+  <!-- Options -->
+  <div class="flex flex-wrap gap-3 items-center">
+    <select id="fontStyle" class="border rounded px-2 py-1">
+      <option value="font-bold">Bold</option>
+      <option value="font-normal">Normal</option>
+      <option value="italic">Italic</option>
+      <option value="font-mono">Monospace</option>
+    </select>
 
-saveBtn.addEventListener('click', async () => {
-  msg.textContent = '';
-  result.classList.add('hidden');
+    <input id="bgColor" type="color" value="#ffffff" title="Background color" class="border rounded p-1" />
+    <input id="fontSize" type="number" value="16" min="10" max="100" title="Font size (px)" class="border rounded px-2 py-1 w-24" />
 
-  const slugInput = document.getElementById('slug').value;
-  const slug = sanitizeSlug(slugInput) || ('text-' + Date.now());
-  const text = document.getElementById('userText').value;
-  const font = document.getElementById('fontStyle').value;
-  const bg = document.getElementById('bgColor').value;
-  const fontSize = parseInt(document.getElementById('fontSize').value) || 16;
+    <button id="saveBtn" class="ml-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Save & Get Link</button>
+  </div>
 
-  if (!text.trim()) { msg.textContent = "Please write some text 😅"; return; }
+  <div id="msg" class="text-red-500 text-sm"></div>
 
-  saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving...';
+  <!-- Result -->
+  <div id="result" class="hidden p-3 border rounded bg-gray-100">
+    <div class="mb-1 font-medium">Your Hosted Link:</div>
+    <a id="publicLink" href="#" target="_blank" class="text-blue-600 underline"></a>
+    <div class="mt-2 text-xs text-gray-600">Copy or download 🌟</div>
+    <div class="flex gap-2 mt-2">
+      <button id="copyBtn" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Copy Link</button>
+      <button id="downloadBtn" class="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600">Download .txt</button>
+    </div>
+  </div>
 
-  try {
-    const res = await fetch('/api/save', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({slug, text, font, bg, fontSize})
-    });
-    const j = await res.json();
-    if (!j.ok) throw new Error(j.error || 'Save failed');
+</div>
 
-    const url = location.origin + '/api/view?slug=' + encodeURIComponent(slug);
-    publicLink.href = url;
-    publicLink.textContent = url;
-    result.classList.remove('hidden');
-  } catch(e) {
-    msg.textContent = e.message;
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'Save & Get Link';
+<script type="module">
+  import { ref, set, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+  const saveBtn = document.getElementById('saveBtn');
+  const msg = document.getElementById('msg');
+  const result = document.getElementById('result');
+  const publicLink = document.getElementById('publicLink');
+  const copyBtn = document.getElementById('copyBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  function sanitizeSlug(s){
+    return s.trim().replace(/[^a-zA-Z0-9\-_]/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '').substring(0,80);
   }
-});
+
+  function generateRandomSlug(length=12){
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let s = '';
+    for(let i=0;i<length;i++) s+=chars.charAt(Math.floor(Math.random()*chars.length));
+    return s;
+  }
+
+  saveBtn.addEventListener('click', async () => {
+    msg.textContent = '';
+    result.classList.add('hidden');
+
+    let slugInput = document.getElementById('slug').value;
+    let slug = sanitizeSlug(slugInput);
+    if(!slug) slug = generateRandomSlug();
+
+    const text = document.getElementById('userText').value;
+    const font = document.getElementById('fontStyle').value;
+    const bg = document.getElementById('bgColor').value;
+    const fontSize = parseInt(document.getElementById('fontSize').value)||16;
+
+    if(!text.trim()){ msg.textContent="Please write some text 😅"; return; }
+
+    saveBtn.disabled=true;
+    saveBtn.textContent='Saving...';
+
+    try{
+      const dbRef = ref(window.db,'texts/'+slug);
+      const snapshot = await get(dbRef);
+      if(snapshot.exists()){ msg.textContent="Slug already exists, choose another 🔑"; return; }
+
+      await set(dbRef, {text,font,bg,fontSize,slug,created:Date.now()});
+
+      const url = location.origin + '/?view=' + encodeURIComponent(slug);
+      publicLink.href=url;
+      publicLink.textContent=url;
+      result.classList.remove('hidden');
+    }catch(e){ msg.textContent=e.message; }
+    finally{ saveBtn.disabled=false; saveBtn.textContent='Save & Get Link'; }
+  });
+
+  copyBtn.addEventListener('click',()=>{ navigator.clipboard.writeText(publicLink.href).then(()=>alert('Link copied ✅')); });
+  downloadBtn.addEventListener('click',()=>{
+    const blob = new Blob([document.getElementById('userText').value], {type:'text/plain'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=(document.getElementById('slug').value||'text')+'.txt';
+    a.click();
+  });
+
+  // Auto load text if ?view=slug
+  async function loadText(){
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('view'); if(!slug) return;
+
+    const dbRef = ref(window.db,'texts/'+slug);
+    const snapshot = await get(dbRef);
+    if(!snapshot.exists()){ alert("Text not found ❌"); return; }
+
+    const data = snapshot.val();
+    document.body.innerHTML=`
+      <div class="min-h-screen flex flex-col items-center justify-center bg-[${data.bg}] font-['Roboto'] p-6">
+        <div class="max-w-3xl p-6 border rounded shadow-lg ${data.font}" style="background:${data.bg}; font-size:${data.fontSize}px">
+          ${data.text.replace(/\n/g,'<br>')}
+        </div>
+      </div>
+    `;
+  }
+
+  loadText();
+
 </script>
 </body>
-  </html>
+</html>
